@@ -1,0 +1,18 @@
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Local SDK config
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# Native build artifacts
+.cxx/
+.externalNativeBuild/
+
+# Misc
+captures/
