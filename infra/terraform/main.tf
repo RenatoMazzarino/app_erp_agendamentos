@@ -197,14 +197,14 @@ resource "aws_iam_role" "ecs_task" {
 }
 
 resource "aws_lb" "api" {
-  name_prefix        = "${substr(local.name_prefix, 0, 6)}-"
+  name_prefix        = substr(local.name_prefix, 0, 6)
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 }
 
 resource "aws_lb_target_group" "api" {
-  name_prefix = "${substr(local.name_prefix, 0, 6)}-"
+  name_prefix = substr(local.name_prefix, 0, 6)
   port        = 8080
   protocol    = "HTTP"
   target_type = "ip"
