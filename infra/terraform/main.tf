@@ -2,6 +2,21 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_ami" "amazon_linux_2023" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023.*-x86_64"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+}
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
@@ -132,9 +147,22 @@ resource "aws_security_group" "aurora" {
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"
-    security_groups = [aws_security_group.ecs_service.id]
+    security_groups = [aws_security_group.ecs_service.id, aws_security_group.bastion.id]
   }
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_security_group" "bastion" {
+  name_prefix = "${local.name_prefix}-bastion-"
+  vpc_id      = aws_vpc.main.id
+
+  # Sem ingresso publico: acesso somente via AWS SSM Session Manager.
   egress {
     from_port   = 0
     to_port     = 0
@@ -196,6 +224,69 @@ resource "aws_iam_role" "ecs_task" {
   })
 }
 
+resource "aws_iam_role_policy" "ecs_task_cognito_auth" {
+  name = "${local.name_prefix}-task-cognito-auth"
+  role = aws_iam_role.ecs_task.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "CognitoAuth"
+        Effect = "Allow"
+        Action = [
+          "cognito-idp:InitiateAuth",
+          "cognito-idp:GlobalSignOut",
+          "cognito-idp:RevokeToken"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "bastion_ssm" {
+  name_prefix = "${local.name_prefix}-bastion-ssm-"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "ec2.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "bastion_ssm_core" {
+  role       = aws_iam_role.bastion_ssm.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "bastion" {
+  name_prefix = "${local.name_prefix}-bastion-profile-"
+  role        = aws_iam_role.bastion_ssm.name
+}
+
+resource "aws_instance" "bastion" {
+  ami                  = data.aws_ami.amazon_linux_2023.id
+  instance_type        = "t3.micro"
+  subnet_id            = aws_subnet.private_a.id
+  iam_instance_profile = aws_iam_instance_profile.bastion.name
+  vpc_security_group_ids = [
+    aws_security_group.bastion.id
+  ]
+
+  # Sem IP publico por seguranca; acesso via SSM.
+  associate_public_ip_address = false
+
+  tags = merge(local.tags, {
+    Name = "${local.name_prefix}-bastion"
+  })
+}
+
 resource "aws_lb" "api" {
   name_prefix        = substr(local.name_prefix, 0, 6)
   load_balancer_type = "application"
@@ -252,7 +343,17 @@ resource "aws_ecs_task_definition" "api" {
       }]
       environment = [
         { name = "APP_ENV", value = var.environment },
-        { name = "PORT", value = "8080" }
+        { name = "PORT", value = "8080" },
+        { name = "AWS_REGION", value = var.aws_region },
+        { name = "COGNITO_AUTH_ENABLED", value = "true" },
+        { name = "COGNITO_USER_POOL_ID", value = aws_cognito_user_pool.main.id },
+        { name = "COGNITO_APP_CLIENT_ID", value = aws_cognito_user_pool_client.mobile.id },
+        { name = "DB_HOST", value = aws_rds_cluster.aurora.endpoint },
+        { name = "DB_PORT", value = "5432" },
+        { name = "DB_NAME", value = var.db_name },
+        { name = "DB_USER", value = var.db_master_username },
+        { name = "DB_PASSWORD", value = var.db_master_password },
+        { name = "DB_SSL", value = "false" }
       ]
       logConfiguration = {
         logDriver = "awslogs"

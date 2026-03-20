@@ -53,3 +53,11 @@ output "sqs_domain_events_url" {
 output "event_bus_name" {
   value = aws_cloudwatch_event_bus.domain.name
 }
+
+output "bastion_instance_id" {
+  value = aws_instance.bastion.id
+}
+
+output "bastion_private_ip" {
+  value = aws_instance.bastion.private_ip
+}

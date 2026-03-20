@@ -20,10 +20,16 @@ captures/
 # Backend node
 backend/node_modules/
 backend/dist/
+backend/.pnpm-store/
+backend/.last_dev_api_image.txt
 
 # Terraform
 infra/terraform/.terraform/
 infra/terraform/*.tfstate
 infra/terraform/*.tfstate.backup
+infra/terraform/*.plan
 infra/terraform/*.tfvars
 !infra/terraform/environments/*.tfvars
+
+# Local editor caches
+.sonarlint/
