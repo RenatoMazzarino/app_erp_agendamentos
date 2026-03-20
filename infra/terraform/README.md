@@ -1,22 +1,36 @@
 # Infra Terraform (AWS + Aurora)
 
-## Pré-requisitos
+## Pre-requisitos
 
-1. Terraform >= 1.8.
+1. Terraform >= 1.8 (ou `hashicorp/terraform` via Docker).
 2. AWS CLI autenticado no perfil alvo.
-3. Permissões para VPC, ECS, RDS, Cognito, S3, SQS, EventBridge e IAM.
+3. Permissoes para VPC, ECS, RDS, Cognito, S3, SQS, EventBridge e IAM.
 
-## Como usar
+## Backend remoto por ambiente
+
+1. `backend/dev.hcl`
+2. `backend/preview.hcl`
+3. `backend/prod.hcl`
+
+## Como usar (dev)
 
 ```powershell
 cd infra/terraform
-terraform init
-terraform plan -var-file="environments/dev.tfvars" -var "db_master_username=platform_admin" -var "db_master_password=SEU_SEGREDO"
-terraform apply -var-file="environments/dev.tfvars" -var "db_master_username=platform_admin" -var "db_master_password=SEU_SEGREDO"
+$env:AWS_PROFILE="estudio_prod_admin"
+terraform init -reconfigure -backend-config="backend/dev.hcl"
+terraform plan -var-file="environments/dev.tfvars"
+terraform apply -var-file="environments/dev.tfvars"
 ```
 
-## Observações
+## Segredos
 
-1. Este baseline já cria Aurora PostgreSQL serverless v2 (writer + reader).
-2. Em produção, usar segredo por `TF_VAR_db_master_password` ou secret store de CI.
-3. HTTPS/ACM/WAF entram no hardening da próxima etapa.
+1. Definir credenciais sensiveis via variavel de ambiente:
+   - `TF_VAR_db_master_username`
+   - `TF_VAR_db_master_password`
+2. Nao hardcode em `.tfvars` versionado.
+3. Em producao, manter segredos no AWS Secrets Manager/CI secret store.
+
+## Observacoes
+
+1. Este baseline cria Aurora PostgreSQL serverless v2 (writer + reader).
+2. HTTPS/ACM/WAF entram no hardening da proxima etapa.
