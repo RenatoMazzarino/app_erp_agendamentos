@@ -15,6 +15,12 @@ Status: em execucao
 3. `infra/terraform/`: provisionamento AWS/Aurora.
 4. `docs/`: runbooks e decisoes de execucao.
 
+## Docs operacionais
+
+1. `docs/EXECUCAO_FASE_1_5_E_2_2026-03-20.md`
+2. `docs/CLIENTES_PARIDADE_WEB_MOBILE.md`
+3. `docs/WORKSPACE_AWS_DB_OPERACAO_2026-03-20.md`
+
 ## Comandos Android
 
 ```powershell

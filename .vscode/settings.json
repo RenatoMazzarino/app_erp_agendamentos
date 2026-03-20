@@ -1,0 +1,19 @@
+{
+  "js/ts.tsdk.path": "backend/node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.tsserver.automaticTypeAcquisition.enabled": false,
+  "eslint.workingDirectories": [
+    {
+      "directory": "backend",
+      "changeProcessCWD": true
+    }
+  ],
+  "sonarlint.connectedMode.project": {
+    "connectionId": "renatomazzarino",
+    "projectKey": "RenatoMazzarino_app_erp_agendamentos"
+  },
+  "deno.enable": false,
+  "files.associations": {
+    "*.tfvars": "terraform"
+  }
+}

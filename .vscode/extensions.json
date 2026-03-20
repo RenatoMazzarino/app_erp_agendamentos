@@ -1,0 +1,18 @@
+{
+  "recommendations": [
+    "fwcd.kotlin",
+    "vscjava.vscode-gradle",
+    "redhat.java",
+    "hashicorp.terraform",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.powershell",
+    "ms-vscode.vscode-github-actions"
+  ],
+  "unwantedRecommendations": [
+    "aarondill.vercel-project-manager-vscode",
+    "denoland.vscode-deno",
+    "bradlc.vscode-tailwindcss",
+    "supabase.vscode-supabase-extension"
+  ]
+}
