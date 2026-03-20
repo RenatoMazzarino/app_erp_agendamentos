@@ -17,6 +17,25 @@ Workspace recomendado:
 Este workspace mantem isolamento de lint e Deno para evitar falso positivo entre
 web e app.
 
+## Plano unificado entre os dois repos
+
+Para evitar drift da documentacao principal da reescrita, os arquivos abaixo
+ficam espelhados por hardlink entre os repos:
+
+1. `docs/plans/PLANO_REESCRITA_REPO_ANDROID_NATIVO_2026-03-20.md`
+2. `docs/plans/ANEXO_PADRONIZACAO_HIGIENE_ERROS_LOADING_REESCRITA_2026-03-20.md`
+
+Resultado pratico:
+
+1. editou em um repo, reflete no outro automaticamente;
+2. apos `checkout/merge/rebase`, hook local reaplica o hardlink.
+
+Script usado neste repo:
+
+```powershell
+.\scripts\dev\sync-shared-plan-links.ps1
+```
+
 ## Ferramentas e papeis
 
 1. VS Code:
