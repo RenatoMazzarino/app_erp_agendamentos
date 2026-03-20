@@ -16,3 +16,14 @@ local.properties
 
 # Misc
 captures/
+
+# Backend node
+backend/node_modules/
+backend/dist/
+
+# Terraform
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/*.tfvars
+!infra/terraform/environments/*.tfvars

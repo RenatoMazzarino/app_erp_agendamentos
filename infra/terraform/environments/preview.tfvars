@@ -1,0 +1,7 @@
+project_name    = "estudio-platform"
+environment     = "preview"
+aws_region      = "sa-east-1"
+dr_region       = "us-east-1"
+vpc_cidr        = "10.41.0.0/16"
+db_name         = "estudioplatform"
+container_image = "public.ecr.aws/docker/library/nginx:latest"

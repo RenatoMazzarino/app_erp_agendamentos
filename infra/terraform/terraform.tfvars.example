@@ -1,0 +1,10 @@
+﻿# Exemplo de variaveis para ambiente de desenvolvimento
+project_name       = "estudio-platform"
+environment        = "dev"
+aws_region         = "sa-east-1"
+dr_region          = "us-east-1"
+vpc_cidr           = "10.40.0.0/16"
+db_name            = "estudioplatform"
+db_master_username = "platform_admin"
+db_master_password = "CHANGE_ME_STRONG_PASSWORD"
+container_image    = "public.ecr.aws/docker/library/nginx:latest"
